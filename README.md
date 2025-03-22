@@ -94,7 +94,7 @@ This Python script communicates with the **YR-3180** module using **Modbus RTU**
 - **Mounting**: Designed for M3 screws or adhesive tape (depending on use case)
 - **Orientation**: Display facing up, cable access from the sides
 
-![YR-3180 Support STL](https://github.com/axpaul/YR-3180/blob/main/CAO/Support%20YR3180%20v%C2%B02%20v9.stl)
+[🔍 View 3D on GitHub](https://github.com/axpaul/YR-3180/blob/main/CAO/Support%20YR3180%20v%C2%B02%20v9.stl)
 
 ---
 

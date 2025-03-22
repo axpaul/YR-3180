@@ -82,13 +82,14 @@ Its main features include:
 |----|--------|-------|-------------|---------|
 | 1  | `Lock` | 0–99999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1231 can the following parameters be entered.| 1230 |
 | 2  | `Dot` | 0.0 / 0.00 / 0.000 | 20kg sensor, can be set to 3 decimal points 20.000kg / 200kg sensor, can be set to 2 decimal points 200.00kg / 2000kg sensor, can be set to 1 decimal point 2000. Okg (based on sensor) | 0.0 |
-| 3  | `LB` | 0–40 | Averaging filter (higher = better filter, slower response) | 5 |
+| 3  | `LB` | 0–40 | 0-No processing, 1 to 40 times of sampling average filtering processing, the larger the setting value, the better the filtering effect, but the slower the speed will be. (higher = better filter, slower response) | 5 |
 | 4  | `Ad-H` | 0 / 1 | Collection speed (0 = slow, 1 = fast) | 0 |
-| 5  | `CLr` | 0–999.9 | Tare range cleared on power-on | 5 |
-| 6  | `Fd` | 1–200 (steps) | Graduation value | 10 |
-| 7  | `Zero` | 0–9999 | Auto-zero tracking range | 10 |
-| 8  | `Zt` | 10.0–600.0 | Zero tracking time (sec) | 60.0 |
-| 9  | `PSET` | 1.0000–9.9999 | Correction coefficient | 1.0000 |
+| 5  | `CLr` | 0–999.9 | The tare and tare range is cleared on power-on. When this parameter is greater than zero, the meter will automatically clear and tare within this range when it is powered on.n | 5 |
+| 6  | `Fd` | 1–200 (steps) | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 1 |
+| 7  | `Zero` | 0–9999 | Zero tracking range, automatically tracks. the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point.
+Note: Automatic clearing is invalid in automatic mode. | 10 |
+| 8  | `Zt` | 10.0–600.0 | Zero tracking time, unit is seconds, factory default is 10 seconds. For example: after the weight value stabilizes, there will be no change in the value. After 10 seconds, it will be automatically cleared. After the value changes, restart the timer. | 60.0 |
+| 9  | `PSET` | 1.0000–9.9999 | Correction coefficient, display value = display value X 1.0000 | 1.0000 |
 
 ---
 

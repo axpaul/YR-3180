@@ -22,6 +22,10 @@
 > 💡 The USB-TTL adapter used is **FTDI TTL-232R-5V-WE** or any compatible 5V TTL adapter.  
 > ⚠️ Be careful to cross RX and TX lines properly between the YR-3180 and the USB adapter.
 
+👉 [TDI TTL-232R-5V-WE](https://ftdichip.com/products/ttl-232r-5v-we/)
+
+![YR-3180 Synoptique](https://github.com/axpaul/YR-3180/blob/main/Image/YR-3180%20Synoptique.png)
+
 ---
 
 ### Python Script Overview
@@ -239,5 +243,13 @@ Press and hold the plus button, put the weight on the sensor, press the setting 
 ## 📎 Source
 
 All content provided is extracted and translated from the **official datasheet** of the YR-3180 Weighing Module, available on:  
-👉 [https://www.yunzhan365.com/basic/83969503.html](https://www.yunzhan365.com/basic/83969503.html)
+👉 [Datasheet](https://www.yunzhan365.com/basic/83969503.html)
 
+---
+
+## 📦 CAD File
+
+- **Filename**: `Support YR3180 v°2 v9.stl`
+- **Format**: STL (compatible with most slicers and 3D printers)
+- **Mounting**: Designed for M3 screws or adhesive tape (depending on use case)
+- **Orientation**: Display facing up, cable access from the sides

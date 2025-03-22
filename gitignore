@@ -1,0 +1,13 @@
+# Ignore les fichiers compilés Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Facultatif : ignorer aussi les fichiers temporaires courants
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db

@@ -69,26 +69,24 @@ This Python script communicates with the **YR-3180** module using **Modbus RTU**
 
 4. These 4 bytes are combined into a **32-bit integer**, which is then converted into a weight value in **kilograms**.
 
----
+### Class `YR3180` – Description
 
-## YR3180 - Python Modbus RTU Interface
+Python class to communicate with the **YR-3180** weighing module using the **Modbus RTU** protocol over TTL/RS232 serial connection.
 
-Classe Python pour communiquer avec le module de pesée **YR-3180** via le protocole **Modbus RTU** sur port série TTL/RS232.
+### Features
 
-### Fonctionnalités
-
-- Lecture du poids brut (int32)
-- Lecture du poids en kg ou en float
-- Tare / Annulation de tare
-- Calibration (point bas / point haut)
-- Lecture et écriture de nombreux paramètres :
-  - Décimales
-  - Vitesse d’acquisition
-  - Filtre
-  - Graduation
-  - Auto-clear au démarrage
-- Lecture des alarmes (valeurs, retour, statut)
-- Lecture de l’adresse Modbus, baudrate, mode CRC
+- Read raw weight (signed int32)
+- Read weight in kilograms or as a floating-point value
+- Tare / Cancel tare
+- Calibration (lower and upper points)
+- Read and write various configuration parameters:
+  - Decimal point precision
+  - Acquisition speed
+  - Filtering
+  - Graduation value
+  - Auto-clear on power-up
+- Read alarm values (thresholds, return values, status)
+- Read Modbus address, baud rate, and checksum mode
 
 ---
 

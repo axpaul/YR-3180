@@ -53,7 +53,7 @@ Its main features include:
 
 ### Python Script Overview
 
-This Python script communicates with the **YR-3180** module using **Modbus RTU** over a serial (RS485/TTL) connection — without any external libraries like `pymodbus`, just using `pyserial`.
+This Python script communicates with the **YR-3180** module using **Modbus RTU** over a serial (TTL) connection — without any external libraries like `pymodbus`, just using `pyserial`.
 
 #### How it works:
 1. A **Modbus RTU request frame** is manually built:

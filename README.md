@@ -29,6 +29,8 @@ Its main features include:
 
 ## 2. Size
 
+![YR-3180 Size](https://github.com/axpaul/YR-3180/blob/main/Image/Size-YR-3180.png)
+
 ### Physical Dimensions
 
 | Parameter         | Value   |
@@ -40,8 +42,6 @@ Its main features include:
 | Button zone       | 31.5 mm |
 | Button spacing    | 10.3 mm |
 | PCB height        | 31.5 mm |
-
-
 
 ---
 

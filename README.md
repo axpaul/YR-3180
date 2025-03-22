@@ -27,6 +27,19 @@ Its main features include:
 
 ## 2. Size
 
+### Physical Dimensions
+
+| Parameter         | Value   |
+|------------------|---------|
+| Total width       | 54.5 mm |
+| Height            | 34.0 mm |
+| Display width     | 37.46 mm |
+| Display height    | 7.00 mm |
+| Button zone       | 31.5 mm |
+| Button spacing    | 10.3 mm |
+| PCB height        | 31.5 mm |
+
+
 
 ---
 

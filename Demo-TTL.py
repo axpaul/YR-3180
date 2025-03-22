@@ -1,3 +1,10 @@
+# -------------------------------------------------------------
+# Fichier : demo_ttl.py
+# Auteur  : Paul Miailhe
+# Date    : 21/03/2025
+# Objet   : Test de communication Modbus RTU via port série avec le module de pesée YR-3180 (mode TTL)
+# -------------------------------------------------------------
+
 import serial   # Pour gérer la communication série
 import time     # (optionnel ici, utile si tu veux temporiser)
 

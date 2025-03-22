@@ -6,6 +6,8 @@
 
 ## 1. Overview
 
+![YR-3180 Front and Back View](https://github.com/axpaul/YR-3180/raw/main/Image/IMG_5954.JPEG)
+
 The **weighing acquisition module** is a **high-performance**, **multi-functional** electronic weighing equipment.  
 It adopts advanced **weighing sensor technology** and can measure the weight of items **in real time**, displaying the result with a **five-digit digital tube**.
 

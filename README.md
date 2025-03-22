@@ -83,9 +83,9 @@ Its main features include:
 | 1  | `Lock` | 0–99999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1231 can the following parameters be entered.| 1230 |
 | 2  | `Dot` | 0.0 / 0.00 / 0.000 | 20kg sensor, can be set to 3 decimal points 20.000kg / 200kg sensor, can be set to 2 decimal points 200.00kg / 2000kg sensor, can be set to 1 decimal point 2000. Okg (based on sensor) | 0.0 |
 | 3  | `LB` | 0–40 | 0-No processing, 1 to 40 times of sampling average filtering processing, the larger the setting value, the better the filtering effect, but the slower the speed will be. (higher = better filter, slower response) | 5 |
-| 4  | `Ad-H` | 0 / 1 | Collection speed (0 = slow, 1 = fast) | 0 |
+| 4  | `Ad-H` | 0, 1 | Collection speed (0 = slow, 1 = fast) | 0 |
 | 5  | `CLr` | 0–999.9 | The tare and tare range is cleared on power-on. When this parameter is greater than zero, the meter will automatically clear and tare within this range when it is powered on.n | 5 |
-| 6  | `Fd` | 1–200 (steps) | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 1 |
+| 6  | `Fd` | 1, 2, 5, 10, 20, 50, 100, 200 (steps) | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 1 |
 | 7  | `Zero` | 0–9999 | Zero tracking range, automatically tracks. the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point. Note: Automatic clearing is invalid in automatic mode. | 10 |
 | 8  | `Zt` | 10.0–600.0 | Zero tracking time, unit is seconds, factory default is 10 seconds. For example: after the weight value stabilizes, there will be no change in the value. After 10 seconds, it will be automatically cleared. After the value changes, restart the timer. | 60.0 |
 | 9  | `PSET` | 1.0000–9.9999 | Correction coefficient, display value = display value X 1.0000 | 1.0000 |
@@ -94,16 +94,15 @@ Its main features include:
 
 ## 5. Alarm Parameters
 
-| #  | Symbol | Range | Description | Default |
-|----|--------|--------|-------------|---------|
-| 01 | `iAB`  | 0–9999 | Enter `1232` after LOCK prompt | 1230 |
+| Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
+|---------------|--------|--------------------|------------|-----------------------|
+| 01 | ikB | 0–9999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1232 can the following parameters be entered. | 1230 |
+|    | AL | PVL<br>PVH<br>PVHL<br>OFF | **PVL**: Both AL1 and AL2 are lower limit alarms. If the measured value is lower than the lower limit, the relay will close.<br>**PVH**: Both AL1 and AL2 are upper limit alarms. If the measured value is higher than the upper limit, the relay will close.<br>**PVHL**: AL1 is the upper limit alarm, AL2 is the lower limit alarm<br>**OFF**: Turn off the alarm function | PVHL |
+| 1 | AL1 | -1999.9 – 9999.9 | AL1 upper limit alarm setting value. When the measured value exceeds (50.0), the relay operates. When the measured value is lower than 45.0, AL1 is disconnected. | 50.0 |
+| 2 | AH1 | -1999.9 – 9999.9 | Upper limit alarm return difference value. | 5.0 |
+| 3 | AL2 | -1999.9 – 9999.9 | AL2 upper limit alarm setting value. When the measured value exceeds (150.0), the relay operates. When the measured value is lower than 145.0, AL1 is disconnected. | 150.0 |
+| 4 | AH2 | -1999.9 – 9999.9 | Upper limit alarm return difference value. | 5.0 |
 
-### Alarm Mode Selection (`AL`)
-- `PVL`: Both AL1 and AL2 are **lower limit alarms**  
-- `PWH`: Both AL1 and AL2 are **upper limit alarms**  
-- `PWL`: AL1 = upper limit, AL2 = lower limit  
-- `OFF`: Disable alarms  
-→ Default: `PVL`
 
 ### Individual Alarms
 

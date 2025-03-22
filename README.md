@@ -78,17 +78,17 @@ Its main features include:
 
 ## 4. General Parameters
 
-| #  | Symbol | Range | Description | Default |
-|----|--------|-------|-------------|---------|
-| 1  | `Lock` | 0–99999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1231 can the following parameters be entered.| 1230 |
-| 2  | `Dot` | 0.0 / 0.00 / 0.000 | 20kg sensor, can be set to 3 decimal points 20.000kg / 200kg sensor, can be set to 2 decimal points 200.00kg / 2000kg sensor, can be set to 1 decimal point 2000. Okg (based on sensor) | 0.0 |
-| 3  | `LB` | 0–40 | 0-No processing, 1 to 40 times of sampling average filtering processing, the larger the setting value, the better the filtering effect, but the slower the speed will be. (higher = better filter, slower response) | 5 |
-| 4  | `Ad-H` | 0, 1 | Collection speed (0 = slow, 1 = fast) | 0 |
-| 5  | `CLr` | 0–999.9 | The tare and tare range is cleared on power-on. When this parameter is greater than zero, the meter will automatically clear and tare within this range when it is powered on.n | 5 |
-| 6  | `Fd` | 1, 2, 5, 10, 20, 50, 100, 200 (steps) | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 1 |
-| 7  | `Zero` | 0–9999 | Zero tracking range, automatically tracks. the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point. Note: Automatic clearing is invalid in automatic mode. | 10 |
-| 8  | `Zt` | 10.0–600.0 | Zero tracking time, unit is seconds, factory default is 10 seconds. For example: after the weight value stabilizes, there will be no change in the value. After 10 seconds, it will be automatically cleared. After the value changes, restart the timer. | 60.0 |
-| 9  | `PSET` | 1.0000–9.9999 | Correction coefficient, display value = display value X 1.0000 | 1.0000 |
+| Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
+|---------------|--------|--------------------|------------|-----------------------|
+| 1 | Lo ck | 0–99999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1231 can the following parameters be entered. | 1230 |
+| 2 | dot | 0.0<br>0.00<br>0.000 | 20kg sensor, can be set to 3 decimal points → 20.000kg<br>200kg sensor, can be set to 2 decimal points → 200.00kg<br>2000kg sensor, can be set to 1 decimal point → 2000.0kg | 0.0 |
+| 3 | LB | 0–40 | 0 = No processing, 1 to 40 times of sampling average filtering processing. The larger the setting value, the better the filtering effect, but the slower the speed will be. | 5 |
+| 4 | Ad-H | 0 / 1 | Collection speed: 0 = low speed, 1 = fast | 0 |
+| 5 | CLr | 0–999.9 | The tare and tare range is cleared on power-on. When this parameter is greater than zero, the meter will automatically clear and tare within this range when it is powered on. | 5 |
+| 6 | Fd | 1, 2, 5, 10, 20, 50, 100, 200 | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 10 |
+| 7 | ZEro | 0–9999 | Zero tracking range, automatically tracks the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point.<br>Note: Automatic clearing is invalid in automatic mode. | 10 |
+| 8 | Zt | 10.0–600.0 | Zero tracking time, unit is seconds, factory default is 10 seconds. For example: after the weight value stabilizes, there will be no change in the value. After 10 seconds, it will be automatically cleared. After the value changes, restart the timer. | 60.0 |
+| 9 | PSET | 0.1000–9.9999 | Correction coefficient, display value = display value × 1.0000 | 1.0000 |
 
 ---
 
@@ -117,67 +117,80 @@ Its main features include:
 
 ## 6. Communication Parameters
 
-| #  | Symbol | Range | Description | Default |
-|----|--------|--------|-------------|---------|
-| 01 | `iAB` | 0–9999 | Enter `1233` after LOCK prompt | 1230 |
-| 02 | `Addr` | 001–255 | Modbus station address | 01 |
-| 03 | `Baud` | 1200–115200 | Baud rate | 9600 |
-| 04 | `Par` | None, Odd, Even | Parity setting | None |
-| 05 | `Fomat` | 1234 / 3412 / 4321 | Data byte order | 123 |
+| Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
+|---------------|--------|--------------------|------------|-----------------------|
+| 01 | ikB | 0–9999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1233 can the following parameters be entered. | 1230 |
+| 02 | Addr | 001–255 | Modbus communication station number | 001 |
+| 03 | Baud | 1200–115200 kbps | Communication port data transmission rate | 9600 |
+| 04 | Pari | None | None: No check digit<br>Odd: even parity bit<br>Even: odd parity bit | 8,N,1 |
+| 05 | Foalot | 1234<br>2134<br>3412<br>4321 | Data sequence:<br>12345678, 42CAFB10;<br>34127856, CA4201FB;<br>56781234, FB1042CA;<br>78563421, 10FBCA42. | 123 |
 
 ---
 
 ## 7. Communication Register Address Map
 
-| Address | Name | Description |
-|---------|------|-------------|
-| 0–1     | `Measurements` | Measurement value |
-| 2–3     | `Floating point` | Decimal number |
-| 4       | `Decimal point` | Display precision |
-| 5       | `Filter` | Filter level |
-| 6       | `Acquisition speed` | Sampling speed |
-| 7       | `Graduation value` | Display step |
-| 8       | `Power-on value` | Start value |
-| 9       | `Auto clear` | Clear value on reset |
-| 10      | `Auto clear enable` | 1 = enabled |
-| 11–12   | `Tare value` | Tare data |
-| 13–14   | `Full scale correction` | Calibration coefficient |
-| 15–16   | `Lower limit AD` | AD value for AL2 |
-| 17–18   | `Upper limit AD` | AD value for AL1 |
-| 19–20   | `Filter code` | Internal filter setting |
-| 21–22   | `Original code` | Factory code |
-| 23–24   | `Range limit` | Full range |
-| 25–26   | `Range upper limit` | Max scale |
-| 32      | `Calibration trigger` | 1 = lower, 2 = upper |
-| 33      | `Peeling` | Write 1 = peel |
+### 7. Communication Register Address
+
+| Address   | Name                          |
+|-----------|-------------------------------|
+| 0, 1      | Measurements                  |
+| 2, 3      | Floating point number         |
+| 4         | Decimal point                 |
+| 5         | Filter                        |
+| 6         | Acquisition speed             |
+| 7         | Graduation value              |
+| 8         | Power-on clear value          |
+| 9         | Automatically clear value     |
+| 10        | Automatic clearing time       |
+| 11, 12    | Tare value                    |
+| 13, 14    | Full scale correction         |
+| 15, 16    | Lower limit calibration AD    |
+| 17, 18    | Upper limit calibration AD    |
+| 19, 20    | Filter code acquisition       |
+| 21, 22    | Original code                 |
+| 23, 24    | Range lower limit value       |
+| 25, 26    | Range upper limit             |
+| 27        | Mailing address               |
+| 28        | Baud rate                     |
+| 29        | Check Digit                   |
+| 30        | Floating point order          |
+| 32        | Write 1 to calibrate the lower limit<br>Write 2 to calibrate the upper limit |
+| 33        | Write 1 peel<br>Write 2 to cancel peeling |
+| 48        | Alarm mode                    |
+| 53, 54    | AL1 alarm value               |
+| 58, 59    | AL1 return difference         |
+| 56, 57    | AL2 alarm value               |
+| 60, 61    | AL2 return difference         |
+| 80        | AL1 alarm status              |
+| 81        | AL2 alarm status              |
+
 
 ---
 
 ## 8. Calibration Instructions
 
-### ➖ Zero Point Calibration (Minus Key)
-1. Do **not** apply any weight  
-2. Hold `Minus`, press `SET`, wait for value `0`  
-3. Release when `END` appears = completed
+Press and hold the minus key, do not put weight on the sensor, press the setting key to change the value to 0.  
+Press Set again and zero point calibration is completed.
 
-| Step | Code | Action |
-|------|------|--------|
-| 01 | `AD` | Capture zero-point AD (no weight) |
-| 02 | `PL` | Input corresponding weight (0) |
-| 03 | `END` | Confirmation message |
+### Press and hold the minus key to calibrate the zero point
+
+| Step | Code | Description |
+|------|------|-------------|
+| 01 | AD | Zero-point AD acquisition code value, do not put weight on the sensor, wait for 2 seconds, press the setting button to save the zero-point acquisition code. |
+| 02 | PL | Enter the weight value corresponding to the zero-point code value. There was no weight on the sensor just now, so the value is set to 0. |
+| 03 | -END | Displaying `END` indicates that the calibration is completed and it will automatically return to the working state. |
 
 ---
 
-### ➕ Full Scale Calibration (Plus Key)
-1. Apply known weight  
-2. Hold `Plus`, press `SET`, wait for confirmation  
-3. Release when `END` appears = completed
+Press and hold the plus button, put the weight on the sensor, press the setting button to change the value to the weight, press the setting button again, and the full scale calibration is completed.
 
-| Step | Code | Action |
-|------|------|--------|
-| 01 | `AD` | Capture full-scale AD (with load) |
-| 02 | `PL` | Input known weight |
-| 03 | `END` | Confirmation message |
+### Long press the plus button to calibrate the full scale
+
+| Step | Code | Description |
+|------|------|-------------|
+| 01 | AD | For the full-scale AD sampling value, a weight must be placed on the sensor. After waiting for 2 seconds, press the setting button to save the full-scale coding value. (More than 20% of sensor range) |
+| 02 | PL | Enter the weight value corresponding to the full-scale code value. This value will be set to the weight just placed on the sensor. Press the Set button to save. |
+| 03 | -END | Displaying `END` indicates that the calibration is completed and it will automatically return to the working state. |
 
 ---
 

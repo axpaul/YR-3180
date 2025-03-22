@@ -56,12 +56,12 @@ Its main features include:
 - **S-**: Signal input negative
 
 ### Communication (TTL / MODBUS RTU)
-- **SP+**: Positive output of power  
+- **5V**: Positive output of power  
 - **RX**: Receive (other device’s TX)  
 - **TX**: Transmit (other device’s RX)  
 - **GND**: Negative power output
 
-### Alarm Outputs
+### Alarm interface
 - **AL1**: Upper limit alarm  
 - **AL2**: Lower limit alarm  
 → Both are LOW level when alarming
@@ -78,8 +78,8 @@ Its main features include:
 
 | #  | Symbol | Range | Description | Default |
 |----|--------|-------|-------------|---------|
-| 1  | `Lock` | 0–99999 | Access code (enter 1231 after LOCK prompt) | 1230 |
-| 2  | `Dot` | 0.0 / 0.00 / 0.000 | Decimal precision (based on sensor) | 0.0 |
+| 1  | `Lock` | 0–99999 | Press the SEL setting key, the display window will display the prompt LOCK, and then display 1230. Only after changing to 1231 can the following parameters be entered.| 1230 |
+| 2  | `Dot` | 0.0 / 0.00 / 0.000 | 20kg sensor, can be set to 3 decimal points 20.000kg / 200kg sensor, can be set to 2 decimal points 200.00kg / 2000kg sensor, can be set to 1 decimal point 2000. Okg (based on sensor) | 0.0 |
 | 3  | `LB` | 0–40 | Averaging filter (higher = better filter, slower response) | 5 |
 | 4  | `Ad-H` | 0 / 1 | Collection speed (0 = slow, 1 = fast) | 0 |
 | 5  | `CLr` | 0–999.9 | Tare range cleared on power-on | 5 |

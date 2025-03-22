@@ -9,5 +9,6 @@ __pycache__/
 *.log
 *.tmp
 *.swp
+*.csv
 .DS_Store
 Thumbs.db

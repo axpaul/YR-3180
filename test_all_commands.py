@@ -1,66 +1,54 @@
-# -------------------------------------------------------------
-# Fichier : test_all_commands.py
-# Auteur  : Paul Miailhe
-# Date    : 22/03/2025
-# Objet   : Script de test global de toutes les commandes YR-3180
-# -------------------------------------------------------------
+import serial
+import struct
 
-from yr3180 import YR3180  # Assure-toi que ta classe est bien dans un fichier nommé yr3180.py
+from yr3180 import YR3180  # Assure-toi que ton fichier principal s'appelle `yr3180.py`
 
 def test_all_get_commands():
-    balance = YR3180(port='COM7')  # Modifie le port si besoin
-
+    print("---- Test de lecture des registres YR-3180 ----")
+    balance = YR3180(port='COM7')  # Change le port si besoin
     try:
-        print("=== Lecture des valeurs de la balance YR-3180 ===")
+        print("Poids brut :", balance.read_weight_raw())
+        print("Poids en kg :", balance.read_weight_kg())
+        print("Poids (float) :", balance.read_weight_float())
 
-        # Poids
-        print("Poids brut (raw) :", balance.read_weight_raw())
-        print("Poids en kg      :", balance.read_weight_kg())
-        print("Poids (float)    :", balance.read_weight_float())
+        print("Decimal Point :", balance.get_decimal_point())
+        print("Filter :", balance.get_filter())
+        print("Speed :", balance.get_speed())
+        print("Graduation :", balance.get_graduation())
+        print("Power On Clear :", balance.get_power_on_clear())
 
-        # Paramètres système
-        print("Décimales :", balance.get_decimal_point())
-        print("Filtre    :", balance.get_filter())
-        print("Vitesse   :", balance.get_speed())
-        print("Graduation:", balance.get_graduation())
-        print("Clear au démarrage :", balance.get_power_on_clear())
-
-        # Communication
         print("Adresse Modbus :", balance.get_slave_address())
-        print("Baudrate code  :", balance.get_baudrate_code())
-        print("Checksum mode  :", balance.get_checksum_mode())
+        print("Baudrate Code :", balance.get_baudrate_code())
+        print("Checksum Mode :", balance.get_checksum_mode())
+        print("Float Format Code :", balance.get_float_format_code())
 
-        # Alarmes
-        print("Mode alarme :", balance.get_alarm_mode())
         print("AL1 - Seuil déclenchement :", balance.get_alarm_value(1))
         print("AL1 - Seuil retour        :", balance.get_alarm_return(1))
         print("AL1 - Statut              :", balance.get_alarm_status(1))
+
         print("AL2 - Seuil déclenchement :", balance.get_alarm_value(2))
         print("AL2 - Seuil retour        :", balance.get_alarm_return(2))
         print("AL2 - Statut              :", balance.get_alarm_status(2))
 
-        # Calibration
-        print("Facteur d’échelle (full scale):", balance.get_full_scale_factor())
-        print("Calibration bas  (ADC) :", balance.get_calibration_low())
-        print("Calibration haut (ADC) :", balance.get_calibration_high())
+        print("Mode d'alarme :", balance.get_alarm_mode())
 
-        # Diagnostiques
-        print("Code ADC brut (original):", balance.get_original_code())
-        print("Filtrage acquisition     :", balance.get_filter_code())
-        print("Limite plage basse       :", balance.get_range_lower_limit())
-        print("Limite plage haute       :", balance.get_range_upper_limit())
+        print("Full Scale Factor :", balance.get_full_scale_factor())
+        print("Calibration LOW :", balance.get_calibration_low())
+        print("Calibration HIGH :", balance.get_calibration_high())
 
-        # Infos complémentaires
-        print("Temps d'effacement auto :", balance.get_automatic_clear_time())
-        print("Valeur de tare actuelle :", balance.get_tare_value())
-        print("Code format float       :", balance.get_float_format_code())
+        print("Filter Code :", balance.get_filter_code())
+        print("Original Code (ADC) :", balance.get_original_code())
+        print("Range Lower Limit :", balance.get_range_lower_limit())
+        print("Range Upper Limit :", balance.get_range_upper_limit())
+
+        print("Automatic Clear Time :", balance.get_automatic_clear_time())
+        print("Tare Value :", balance.get_tare_value())
 
     except Exception as e:
-        print("Erreur lors du test :", e)
-
+        print("Erreur pendant le test :", e)
     finally:
         balance.close()
+        print("Connexion fermée.")
 
 if __name__ == "__main__":
     test_all_get_commands()
-

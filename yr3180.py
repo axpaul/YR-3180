@@ -1,3 +1,10 @@
+# -------------------------------------------------------------
+# Fichier : yr3180.py
+# Auteur  : Paul Miailhe
+# Date    : 22/03/2025
+# Objet   : Classe Python pour la communication avec le module YR-3180 via Modbus RTU
+# -------------------------------------------------------------
+
 import serial   # Pour communiquer en port série
 import struct   # Pour décoder les valeurs binaires (float notamment)
 

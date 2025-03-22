@@ -1,7 +1,14 @@
+# -------------------------------------------------------------
+# Fichier : test_all_commands.py
+# Auteur  : Paul Miailhe
+# Date    : 22/03/2025
+# Objet   : Script de test pour lire tous les paramètres du module YR-3180
+# -------------------------------------------------------------
+
 import serial
 import struct
 
-from yr3180 import YR3180  # Assure-toi que ton fichier principal s'appelle `yr3180.py`
+from yr3180 import YR3180 
 
 def test_all_get_commands():
     print("---- Test de lecture des registres YR-3180 ----")

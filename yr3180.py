@@ -24,6 +24,8 @@ class YR3180:
         """
         self.serial.close()
 
+# ---------------------- Communication bas niveau ----------------------
+
     def _calculate_crc(self, data):
         """
         Calcule le CRC Modbus RTU à partir de la trame (hors CRC)
@@ -114,7 +116,7 @@ class YR3180:
         data = self._read_registers(2, 2)
         return struct.unpack('>f', data)[0]  # '>f' = float big endian
 
-    # ---------------------- Commandes directes ----------------------
+ # ---------------------- Commandes directes (tare, calibration, etc.) ----------------------
 
     def tare(self):
         """Effectue une tare (mise à zéro du poids actuel)"""
@@ -136,7 +138,7 @@ class YR3180:
         """Déclenche un effacement automatique si la config le permet"""
         self._write_register(9, 1)
 
-    # ---------------------- Paramètres système ----------------------
+# ---------------------- Paramètres système (filtrage, vitesse, affichage...) ----------------------
 
     def get_decimal_point(self):
         """Lit le nombre de décimales affichées (registre 4)"""
@@ -173,10 +175,12 @@ class YR3180:
     def get_power_on_clear(self):
         """Retourne le mode d’effacement au démarrage (registre 8)"""
         return int.from_bytes(self._read_registers(8, 1), byteorder='big')
-
+    
     def set_power_on_clear(self, value):
         """Modifie le mode d’effacement au démarrage (registre 8)"""
         self._write_register(8, value)
+    
+# ---------------------- Communication Modbus (adresse, baudrate, checksum) ----------------------
 
     def get_slave_address(self):
         """Lit l'adresse Modbus de la balance (registre 27)"""
@@ -190,33 +194,166 @@ class YR3180:
         """Lit le mode de vérification (registre 29)"""
         return int.from_bytes(self._read_registers(29, 1), byteorder='big')
 
-    # ---------------------- Alarmes ----------------------
+    def get_float_format_code(self):
+        """
+        Lit le code de configuration du format flottant (registre 30).
+        Peut indiquer l’ordre des octets pour les conversions float.
+        """
+        return int.from_bytes(self._read_registers(30, 1), byteorder='big')
+    
+        # ---------------------- Alarmes (seuils, statuts, modes) ----------------------
 
     def get_alarm_value(self, alarm=1):
         """
-        Lit la valeur de déclenchement de l'alarme :
-        AL1 → registres 53-54
-        AL2 → registres 56-57
+        Lit la valeur de déclenchement de l'alarme (seuil haut).
+        AL1 → registres 53–54
+        AL2 → registres 56–57
         """
         address = 53 if alarm == 1 else 56
         data = self._read_registers(address, 2)
         return int.from_bytes(data, byteorder='big', signed=True)
 
+    def set_alarm_value(self, value, alarm=1):
+        """
+        Définit la valeur de déclenchement de l'alarme (seuil haut).
+        AL1 → registres 53–54
+        AL2 → registres 56–57
+        """
+        address = 53 if alarm == 1 else 56
+        msb = (value >> 16) & 0xFFFF
+        lsb = value & 0xFFFF
+        self._write_register(address, msb)
+        self._write_register(address + 1, lsb)
+
     def get_alarm_return(self, alarm=1):
         """
-        Lit la valeur de retour (seuil de réarmement) :
-        AL1 → registres 58-59
-        AL2 → registres 60-61
+        Lit la valeur de retour (seuil de réarmement de l'alarme).
+        AL1 → registres 58–59
+        AL2 → registres 60–61
         """
         address = 58 if alarm == 1 else 60
         data = self._read_registers(address, 2)
         return int.from_bytes(data, byteorder='big', signed=True)
 
+    def set_alarm_return(self, value, alarm=1):
+        """
+        Définit la valeur de retour (seuil de réarmement de l'alarme).
+        AL1 → registres 58–59
+        AL2 → registres 60–61
+        """
+        address = 58 if alarm == 1 else 60
+        msb = (value >> 16) & 0xFFFF
+        lsb = value & 0xFFFF
+        self._write_register(address, msb)
+        self._write_register(address + 1, lsb)
+
     def get_alarm_status(self, alarm=1):
         """
-        Lit le statut d’activation actuel de l'alarme (ON/OFF) :
+        Lit le statut d’activation actuel de l'alarme (ON/OFF).
         AL1 → registre 80
         AL2 → registre 81
         """
         address = 80 if alarm == 1 else 81
         return int.from_bytes(self._read_registers(address, 1), byteorder='big')
+
+    def get_alarm_mode(self):
+        """
+        Lit le mode d’alarme configuré (registre 48).
+        Définit le comportement de déclenchement (mode haut/bas, hystérésis, etc.).
+        """
+        return int.from_bytes(self._read_registers(48, 1), byteorder='big')
+
+    def set_alarm_mode(self, value):
+        """
+        Définit le mode d’alarme configuré (registre 48).
+        Exemple : 0 = OFF, 1 = seuil haut, 2 = seuil bas, etc.
+        """
+        self._write_register(48, value)
+
+    
+ # ---------------------- Calibration (scale factor, ADC min/max) ----------------------
+    
+    def set_full_scale_factor(self, value):
+        """Écrit manuellement le facteur d’échelle dans les registres 13-14"""
+        msb = (value >> 16) & 0xFFFF
+        lsb = value & 0xFFFF
+        self._write_register(13, msb)
+        self._write_register(14, lsb)
+
+    def get_full_scale_factor(self):
+        """
+        Lit la valeur de calibration max (scale factor) sur 32 bits
+        à partir des registres 13 et 14 (MSB + LSB).
+        """
+        data = self._read_registers(13, 2)
+        return int.from_bytes(data, byteorder='big', signed=False)
+
+    def get_calibration_low(self):
+        """
+        Lit la valeur ADC du point bas de calibration (registre 15–16)
+        """
+        data = self._read_registers(15, 2)
+        return int.from_bytes(data, byteorder='big', signed=False)
+
+    def get_calibration_high(self):
+        """
+        Lit la valeur ADC du point haut de calibration (registre 17–18)
+        """
+        data = self._read_registers(17, 2)
+        return int.from_bytes(data, byteorder='big', signed=False)
+    
+# ---------------------- Valeurs internes & diagnostics ----------------------
+    
+    def get_filter_code(self):
+        """
+        Lit la valeur du code de filtrage à l’acquisition (registres 19–20)
+        """
+        data = self._read_registers(19, 2)
+        return int.from_bytes(data, byteorder='big', signed=False)
+    
+    def get_original_code(self):
+        """
+        Lit la valeur brute (code ADC) avant tout traitement logiciel.
+        Ce code peut être utile pour le debug ou l’analyse fine du signal entrant.
+        Registres : 21–22
+        Format : entier signé 32 bits (big endian)
+        """
+        data = self._read_registers(21, 2)
+        return int.from_bytes(data, byteorder='big', signed=True)
+
+    def get_range_lower_limit(self):
+        """
+        Lit la limite basse de la plage de mesure définie pour le capteur.
+        Cela peut servir pour les alarmes ou pour filtrer des données anormales.
+        Registres : 23–24
+        Format : entier signé 32 bits (big endian)
+        """
+        data = self._read_registers(23, 2)
+        return int.from_bytes(data, byteorder='big', signed=True)
+
+    def get_range_upper_limit(self):
+        """
+        Lit la limite haute de la plage de mesure définie pour le capteur.
+        Permet de connaître le seuil max attendu pour les mesures.
+        Registres : 25–26
+        Format : entier signé 32 bits (big endian)
+        """
+        data = self._read_registers(25, 2)
+        return int.from_bytes(data, byteorder='big', signed=True)
+
+
+    def get_automatic_clear_time(self):
+        """
+        Lit le délai configuré pour le clear automatique (registre 10).
+        Représente le temps en secondes avant reset automatique.
+        """
+        return int.from_bytes(self._read_registers(10, 1), byteorder='big')
+
+    def get_tare_value(self):
+        """
+        Lit la valeur de tare actuelle enregistrée (registres 11–12).
+        Peut être utile pour diagnostiquer un offset appliqué.
+        """
+        data = self._read_registers(11, 2)
+        return int.from_bytes(data, byteorder='big', signed=True)
+

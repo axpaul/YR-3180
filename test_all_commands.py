@@ -5,60 +5,62 @@
 # Objet   : Script de test global de toutes les commandes YR-3180
 # -------------------------------------------------------------
 
-from yr3180 import YR3180
-import time
+from yr3180 import YR3180  # Assure-toi que ta classe est bien dans un fichier nommé yr3180.py
 
-balance = YR3180(port='COM7')  # 🔧 adapter le port ici
+def test_all_get_commands():
+    balance = YR3180(port='COM7')  # Modifie le port si besoin
 
-try:
-    print("===== TEST LECTURES =====")
-    print(f"Poids brut        : {balance.read_weight_raw()} (int32)")
-    print(f"Poids en kg       : {balance.read_weight_kg():.3f} kg")
-    print(f"Poids flottant    : {balance.read_weight_float():.3f} kg")
+    try:
+        print("=== Lecture des valeurs de la balance YR-3180 ===")
 
-    print(f"Décimales         : {balance.get_decimal_point()}")
-    print(f"Filtrage          : {balance.get_filter()}")
-    print(f"Vitesse d'acq.    : {balance.get_speed()}")
-    print(f"Graduation        : {balance.get_graduation()}")
-    print(f"Effacement au démarrage : {balance.get_power_on_clear()}")
+        # Poids
+        print("Poids brut (raw) :", balance.read_weight_raw())
+        print("Poids en kg      :", balance.read_weight_kg())
+        print("Poids (float)    :", balance.read_weight_float())
 
-    print(f"Adresse Modbus    : {balance.get_slave_address()}")
-    print(f"Baudrate code     : {balance.get_baudrate_code()}")
-    print(f"Checksum mode     : {balance.get_checksum_mode()}")
+        # Paramètres système
+        print("Décimales :", balance.get_decimal_point())
+        print("Filtre    :", balance.get_filter())
+        print("Vitesse   :", balance.get_speed())
+        print("Graduation:", balance.get_graduation())
+        print("Clear au démarrage :", balance.get_power_on_clear())
 
-    print(f"Alarme 1 statut   : {balance.get_alarm_status(1)}")
-    print(f"Alarme 1 valeur   : {balance.get_alarm_value(1)}")
-    print(f"Alarme 1 retour   : {balance.get_alarm_return(1)}")
+        # Communication
+        print("Adresse Modbus :", balance.get_slave_address())
+        print("Baudrate code  :", balance.get_baudrate_code())
+        print("Checksum mode  :", balance.get_checksum_mode())
 
-    print(f"Alarme 2 statut   : {balance.get_alarm_status(2)}")
-    print(f"Alarme 2 valeur   : {balance.get_alarm_value(2)}")
-    print(f"Alarme 2 retour   : {balance.get_alarm_return(2)}")
+        # Alarmes
+        print("Mode alarme :", balance.get_alarm_mode())
+        print("AL1 - Seuil déclenchement :", balance.get_alarm_value(1))
+        print("AL1 - Seuil retour        :", balance.get_alarm_return(1))
+        print("AL1 - Statut              :", balance.get_alarm_status(1))
+        print("AL2 - Seuil déclenchement :", balance.get_alarm_value(2))
+        print("AL2 - Seuil retour        :", balance.get_alarm_return(2))
+        print("AL2 - Statut              :", balance.get_alarm_status(2))
 
-    print("\n===== TEST COMMANDES ACTIVES =====")
-    print("→ Tare...")
-    balance.tare()
-    time.sleep(0.5)
+        # Calibration
+        print("Facteur d’échelle (full scale):", balance.get_full_scale_factor())
+        print("Calibration bas  (ADC) :", balance.get_calibration_low())
+        print("Calibration haut (ADC) :", balance.get_calibration_high())
 
-    print("→ Calibration bas...")
-    balance.calibrate_lower()
-    time.sleep(0.5)
+        # Diagnostiques
+        print("Code ADC brut (original):", balance.get_original_code())
+        print("Filtrage acquisition     :", balance.get_filter_code())
+        print("Limite plage basse       :", balance.get_range_lower_limit())
+        print("Limite plage haute       :", balance.get_range_upper_limit())
 
-    print("→ Calibration haut...")
-    balance.calibrate_upper()
-    time.sleep(0.5)
+        # Infos complémentaires
+        print("Temps d'effacement auto :", balance.get_automatic_clear_time())
+        print("Valeur de tare actuelle :", balance.get_tare_value())
+        print("Code format float       :", balance.get_float_format_code())
 
-    print("→ Annulation tare...")
-    balance.cancel_tare()
-    time.sleep(0.5)
+    except Exception as e:
+        print("Erreur lors du test :", e)
 
-    print("→ Effacement automatique...")
-    balance.auto_clear()
-    time.sleep(0.5)
+    finally:
+        balance.close()
 
-    print("\n✅ Tous les tests ont été envoyés.")
+if __name__ == "__main__":
+    test_all_get_commands()
 
-except Exception as e:
-    print("❌ Erreur pendant les tests :", e)
-
-finally:
-    balance.close()

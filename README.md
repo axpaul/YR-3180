@@ -6,20 +6,22 @@
 
 ## 1. Overview
 
-The weighing acquisition module is a high-performance, multi-functional electronic weighing device. It adopts advanced sensor technology to measure the weight of items in real-time and displays the value on a **five-digit LED display**.
+The **weighing acquisition module** is a **high-performance**, **multi-functional** electronic weighing equipment.  
+It adopts advanced **weighing sensor technology** and can measure the weight of items **in real time**, displaying the result with a **five-digit digital tube**.
 
-It also features upper and lower limit alarm functions for precise weight control and monitoring. The module supports **TTL and MODBUS RTU communication protocols**, making it compatible with PLCs, PCs, and other devices for remote data transmission and control.
-
-Power is supplied via a **Type-C interface**, and configuration is facilitated by **button-based debugging**.
+It also includes **upper and lower limit alarm functions**, enabling **precise control and monitoring** of weight.  
+At the same time, the product features a **TTL (5V) communication interface** and supports the **MODBUS RTU communication protocol**, allowing for fast and reliable communication with **PLCs**, **computers**, and other devices to enable **data transmission and remote control**.
+Additionally, it supports **Type-C power supply** and includes **button-based debugging functions**, enhancing ease of use and operational stability.
+Its main features include:
 
 ### Key Features
 
-1. High-precision weighing sensor enables accurate weight detection and display.  
-2. Five-digit digital display for intuitive and fast reading.  
-3. Upper and lower limit alarms allow for early warnings and strict control.  
-4. TTL and MODBUS RTU protocols for fast communication and control.  
-5. Type-C power input and button-based debugging for stable and convenient use.  
-6. Compact, lightweight, and easy to install.
+1. High-precision weighing sensor enables accurate weight detection and numerical display.  
+2. Five-digit digital tube display, intuitive and clear, can achieve high-speed weighing and is suitable for efficient weighing process.  
+3. Upper and lower limit alarm functions facilitate early warning and strict control to improve quality.  
+4. Supports TTL communication interface and MODBUS RTU communication protocol to realize data transmission and remote control conveniently and quickly.  
+5. Type-C /5V power supply and button debugging function, easy to use and strong stability.  
+6. Light and portable, easy to install and move, saving space and cost. To sum up, the weighing acquisition module is a practical, high-performance, multi-functional electronic weighing equipment that can be widely used in weighing measurement and control applications in various production lines and logistics and warehousing situations to achieve weighing data Remote transmission and precise  
 
 ---
 

@@ -1,12 +1,54 @@
 # YR-3180 – Intelligent Weighing Digital Display Module
 
+![YR-3180 Front and Back View](https://github.com/axpaul/YR-3180/raw/main/Image/IMG_5954.JPEG)
+
+---
+
+## YR-3180 Weight Sensor – Serial Read Example
+
+### Hardware Wiring
+
+| YR-3180 Pin    | Function                  | Connects To                      |
+|----------------|---------------------------|----------------------------------|
+| **E+**         | Load cell power (+)       | Load cell **5V OUT**             |
+| **E-**         | Load cell ground (–)      | Load cell **GND**                |
+| **INA+**       | Load cell signal (+)      | Load cell **INA+**               |
+| **INA-**       | Load cell signal (–)      | Load cell **INA-**               |
+| **5V**         | Power input               | USB-TTL adapter **5V**           |
+| **RX**         | Serial receive (input)    | USB-TTL **TX (orange)**          |
+| **TX**         | Serial transmit (output)  | USB-TTL **RX (yellow)**          |
+| **GND**        | Ground                    | USB-TTL **GND (black)**          |
+
+> 💡 The USB-TTL adapter used is **FTDI TTL-232R-5V-WE** or any compatible 5V TTL adapter.  
+> ⚠️ Be careful to cross RX and TX lines properly between the YR-3180 and the USB adapter.
+
+---
+
+### Python Script Overview
+
+This Python script communicates with the **YR-3180** module using **Modbus RTU** over a serial (RS485/TTL) connection — without any external libraries like `pymodbus`, just using `pyserial`.
+
+#### How it works:
+1. A **Modbus RTU request frame** is manually built:
+   - Slave address: `0x01`
+   - Function code: `0x03` (Read Holding Registers)
+   - Starting register: `0x0000`
+   - Quantity: `2` registers
+   - A CRC is calculated and appended
+
+2. The request is sent over the serial port (e.g., `COM7` on Windows).
+
+3. The response is parsed to extract **2 registers** (4 bytes).
+
+4. These 4 bytes are combined into a **32-bit integer**, which is then converted into a weight value in **kilograms**.
+
+---
+
 > 📄 This documentation is based on the official datasheet of the YR-3180 module and includes all available information and specifications.
 
 ---
 
 ## 1. Overview
-
-![YR-3180 Front and Back View](https://github.com/axpaul/YR-3180/raw/main/Image/IMG_5954.JPEG)
 
 The **weighing acquisition module** is a **high-performance**, **multi-functional** electronic weighing equipment.  
 It adopts advanced **weighing sensor technology** and can measure the weight of items **in real time**, displaying the result with a **five-digit digital tube**.

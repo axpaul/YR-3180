@@ -86,8 +86,7 @@ Its main features include:
 | 4  | `Ad-H` | 0 / 1 | Collection speed (0 = slow, 1 = fast) | 0 |
 | 5  | `CLr` | 0–999.9 | The tare and tare range is cleared on power-on. When this parameter is greater than zero, the meter will automatically clear and tare within this range when it is powered on.n | 5 |
 | 6  | `Fd` | 1–200 (steps) | Optional graduation values: 1, 2, 5, 10, 20, 50, 100, 200 | 1 |
-| 7  | `Zero` | 0–9999 | Zero tracking range, automatically tracks. the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point.
-Note: Automatic clearing is invalid in automatic mode. | 10 |
+| 7  | `Zero` | 0–9999 | Zero tracking range, automatically tracks. the deviation of weighing near the zero point, so that the gross weight display is maintained at the zero point. Note: Automatic clearing is invalid in automatic mode. | 10 |
 | 8  | `Zt` | 10.0–600.0 | Zero tracking time, unit is seconds, factory default is 10 seconds. For example: after the weight value stabilizes, there will be no change in the value. After 10 seconds, it will be automatically cleared. After the value changes, restart the timer. | 60.0 |
 | 9  | `PSET` | 1.0000–9.9999 | Correction coefficient, display value = display value X 1.0000 | 1.0000 |
 

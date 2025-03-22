@@ -1,5 +1,30 @@
 # YR-3180 – Intelligent Weighing Digital Display Module
 
+---
+
+> 📄 This documentation is based on the official datasheet of the YR-3180 module and includes all available information and specifications.
+
+---
+
+## Overview
+
+The **weighing acquisition module** is a **high-performance**, **multi-functional** electronic weighing equipment.  
+It adopts advanced **weighing sensor technology** and can measure the weight of items **in real time**, displaying the result with a **five-digit digital tube**.
+
+It also includes **upper and lower limit alarm functions**, enabling **precise control and monitoring** of weight.  
+At the same time, the product features a **TTL (5V) communication interface** and supports the **MODBUS RTU communication protocol**, allowing for fast and reliable communication with **PLCs**, **computers**, and other devices to enable **data transmission and remote control**.
+Additionally, it supports **Type-C power supply** and includes **button-based debugging functions**, enhancing ease of use and operational stability.
+Its main features include:
+
+### Key Features
+
+1. High-precision weighing sensor enables accurate weight detection and numerical display.  
+2. Five-digit digital tube display, intuitive and clear, can achieve high-speed weighing and is suitable for efficient weighing process.  
+3. Upper and lower limit alarm functions facilitate early warning and strict control to improve quality.  
+4. Supports TTL communication interface and MODBUS RTU communication protocol to realize data transmission and remote control conveniently and quickly.  
+5. Type-C /5V power supply and button debugging function, easy to use and strong stability.  
+6. Light and portable, easy to install and move, saving space and cost. To sum up, the weighing acquisition module is a practical, high-performance, multi-functional electronic weighing equipment that can be widely used in weighing measurement and control applications in various production lines and logistics and warehousing situations to achieve weighing data Remote transmission and precise  
+
 ![YR-3180 Front and Back View](https://github.com/axpaul/YR-3180/raw/main/Image/IMG_5954.JPEG)
 
 ---
@@ -19,10 +44,8 @@
 | **TX**         | Serial transmit (output)  | USB-TTL **RX (yellow)**          |
 | **GND**        | Ground                    | USB-TTL **GND (black)**          |
 
-> 💡 The USB-TTL adapter used is **FTDI TTL-232R-5V-WE** or any compatible 5V TTL adapter.  
+> 💡 The USB-TTL adapter used is [TDI TTL-232R-5V-WE](https://ftdichip.com/products/ttl-232r-5v-we/) or any compatible 5V TTL adapter.  
 > ⚠️ Be careful to cross RX and TX lines properly between the YR-3180 and the USB adapter.
-
-👉 [TDI TTL-232R-5V-WE](https://ftdichip.com/products/ttl-232r-5v-we/)
 
 ![YR-3180 Synoptique](https://github.com/axpaul/YR-3180/blob/main/Image/YR-3180%20Synoptique.png)
 
@@ -48,32 +71,7 @@ This Python script communicates with the **YR-3180** module using **Modbus RTU**
 
 ---
 
-> 📄 This documentation is based on the official datasheet of the YR-3180 module and includes all available information and specifications.
-
----
-
-## 1. Overview
-
-The **weighing acquisition module** is a **high-performance**, **multi-functional** electronic weighing equipment.  
-It adopts advanced **weighing sensor technology** and can measure the weight of items **in real time**, displaying the result with a **five-digit digital tube**.
-
-It also includes **upper and lower limit alarm functions**, enabling **precise control and monitoring** of weight.  
-At the same time, the product features a **TTL (5V) communication interface** and supports the **MODBUS RTU communication protocol**, allowing for fast and reliable communication with **PLCs**, **computers**, and other devices to enable **data transmission and remote control**.
-Additionally, it supports **Type-C power supply** and includes **button-based debugging functions**, enhancing ease of use and operational stability.
-Its main features include:
-
-### Key Features
-
-1. High-precision weighing sensor enables accurate weight detection and numerical display.  
-2. Five-digit digital tube display, intuitive and clear, can achieve high-speed weighing and is suitable for efficient weighing process.  
-3. Upper and lower limit alarm functions facilitate early warning and strict control to improve quality.  
-4. Supports TTL communication interface and MODBUS RTU communication protocol to realize data transmission and remote control conveniently and quickly.  
-5. Type-C /5V power supply and button debugging function, easy to use and strong stability.  
-6. Light and portable, easy to install and move, saving space and cost. To sum up, the weighing acquisition module is a practical, high-performance, multi-functional electronic weighing equipment that can be widely used in weighing measurement and control applications in various production lines and logistics and warehousing situations to achieve weighing data Remote transmission and precise  
-
----
-
-## 2. Size
+## Size - Dimention
 
 ![YR-3180 Size](https://github.com/axpaul/YR-3180/blob/main/Image/Size-YR-3180.png)
 
@@ -89,9 +87,16 @@ Its main features include:
 | Button spacing    | 10.3 mm |
 | PCB height        | 31.5 mm |
 
+### CAD File
+
+- **Filename**: `Support YR3180 v°2 v9.stl`
+- **Format**: STL (compatible with most slicers and 3D printers)
+- **Mounting**: Designed for M3 screws or adhesive tape (depending on use case)
+- **Orientation**: Display facing up, cable access from the sides
+
 ---
 
-## 3. Wiring Diagram
+## Wiring Diagram
 
 ### Power Supply
 - **+5V**: Positive power supply  
@@ -122,7 +127,7 @@ Its main features include:
 
 ---
 
-## 4. General Parameters
+## General Parameters
 
 | Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
 |---------------|--------|--------------------|------------|-----------------------|
@@ -138,7 +143,7 @@ Its main features include:
 
 ---
 
-## 5. Alarm Parameters
+## Alarm Parameters
 
 | Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
 |---------------|--------|--------------------|------------|-----------------------|
@@ -161,7 +166,7 @@ Its main features include:
 
 ---
 
-## 6. Communication Parameters
+## Communication Parameters
 
 | Serial Number | Symbol | Predetermined Area | Illustrate | Factory Preset Value |
 |---------------|--------|--------------------|------------|-----------------------|
@@ -173,9 +178,9 @@ Its main features include:
 
 ---
 
-## 7. Communication Register Address Map
+## Communication Register Address Map
 
-### 7. Communication Register Address
+### Communication Register Address
 
 | Address   | Name                          |
 |-----------|-------------------------------|
@@ -213,7 +218,7 @@ Its main features include:
 
 ---
 
-## 8. Calibration Instructions
+## Calibration Instructions
 
 Press and hold the minus key, do not put weight on the sensor, press the setting key to change the value to 0.  
 Press Set again and zero point calibration is completed.
@@ -242,14 +247,5 @@ Press and hold the plus button, put the weight on the sensor, press the setting 
 
 ## 📎 Source
 
-All content provided is extracted and translated from the **official datasheet** of the YR-3180 Weighing Module, available on:  
-👉 [Datasheet](https://www.yunzhan365.com/basic/83969503.html)
+All content provided is extracted and translated from the **official datasheet** of the YR-3180 Weighing Module, available on: [Datasheet](https://www.yunzhan365.com/basic/83969503.html)
 
----
-
-## 📦 CAD File
-
-- **Filename**: `Support YR3180 v°2 v9.stl`
-- **Format**: STL (compatible with most slicers and 3D printers)
-- **Mounting**: Designed for M3 screws or adhesive tape (depending on use case)
-- **Orientation**: Display facing up, cable access from the sides

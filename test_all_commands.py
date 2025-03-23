@@ -12,7 +12,7 @@ from yr3180 import YR3180
 
 def test_all_get_commands():
     print("---- Test de lecture des registres YR-3180 ----")
-    balance = YR3180(port='COM7')  # Change le port si besoin
+    balance = YR3180(port='COM7', baudrate=115200)  # Change le port si besoin
     try:
         print("Poids brut :", balance.read_weight_raw())
         print("Poids en kg :", balance.read_weight_kg())

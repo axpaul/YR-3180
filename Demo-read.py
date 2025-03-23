@@ -1,3 +1,10 @@
+# -------------------------------------------------------------
+# Fichier : demo_read.py
+# Auteur  : Paul Miailhe
+# Date    : 21/03/2025
+# Objet   : Prise de mesure
+# -------------------------------------------------------------
+
 import csv
 import threading
 import time

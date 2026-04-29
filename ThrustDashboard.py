@@ -10,6 +10,7 @@ import os
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import QThread, Signal
 import pyqtgraph as pg
+import serial.tools.list_ports
 
 from yr3180 import YR3180
 
@@ -216,7 +217,15 @@ class MainWindow(QtWidgets.QMainWindow):
         acq_group = QtWidgets.QGroupBox("ACQUISITION")
         acq_layout = QtWidgets.QFormLayout()
         
-        self.port_input = QtWidgets.QLineEdit("COM5")
+        # Port COM dynamique
+        port_layout = QtWidgets.QHBoxLayout()
+        self.port_combo = QtWidgets.QComboBox()
+        self.refresh_port_btn = QtWidgets.QPushButton("🔄")
+        self.refresh_port_btn.setFixedWidth(30)
+        self.refresh_port_btn.clicked.connect(self.refresh_ports)
+        port_layout.addWidget(self.port_combo)
+        port_layout.addWidget(self.refresh_port_btn)
+        port_layout.setContentsMargins(0,0,0,0)
         self.baud_combo = QtWidgets.QComboBox()
         self.baud_combo.addItems(["9600", "19200", "38400", "57600", "115200"])
         self.baud_combo.setCurrentText("9600")
@@ -228,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rec_checkbox = QtWidgets.QCheckBox("Enregistrer (.bin)")
         self.rec_checkbox.setChecked(True)
         
-        acq_layout.addRow("Port:", self.port_input)
+        acq_layout.addRow("Port:", port_layout)
         acq_layout.addRow("Baudrate:", self.baud_combo)
         acq_layout.addRow("Fréq (Hz):", self.hz_input)
         acq_layout.addRow("", self.rec_checkbox)
@@ -294,7 +303,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui_timer.setInterval(33) # ~30fps
         
         self.last_poids_kg = 0.0
+        self.refresh_ports()
         self.log_message("🚀 Thrust Dashboard initialisé. Prêt à démarrer.")
+
+    def refresh_ports(self):
+        self.port_combo.clear()
+        ports = serial.tools.list_ports.comports()
+        for p in ports:
+            self.port_combo.addItem(f"{p.device} - {p.description}")
+        if not ports:
+            self.port_combo.addItem("Aucun port trouvé")
 
     def log_message(self, msg):
         ts = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -325,7 +343,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_display_values()
 
     def start_acq(self):
-        port = self.port_input.text().strip()
+        port_text = self.port_combo.currentText()
+        port = port_text.split(" ")[0] if port_text and "Aucun" not in port_text else ""
+        if not port:
+            self.log_message("⚠️ Veuillez sélectionner un port COM valide.")
+            return
         baudrate = int(self.baud_combo.currentText())
         target_hz = self.hz_input.value()
         
@@ -351,7 +373,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.start_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
-        self.port_input.setEnabled(False)
+        self.port_combo.setEnabled(False)
+        self.refresh_port_btn.setEnabled(False)
         self.baud_combo.setEnabled(False)
 
     def stop_acq(self):
@@ -364,7 +387,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.start_btn.setEnabled(True)
         self.stop_btn.setEnabled(False)
-        self.port_input.setEnabled(True)
+        self.port_combo.setEnabled(True)
+        self.refresh_port_btn.setEnabled(True)
         self.baud_combo.setEnabled(True)
 
     def on_new_data(self, t, val_kg):

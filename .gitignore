@@ -1,14 +1,27 @@
-# Ignore les fichiers compilés Python
+# Environnements virtuels
+.venv/
+venv/
+ENV/
+env/
+
+# Fichiers compilés Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.pyc
 
-# Facultatif : ignorer aussi les fichiers temporaires courants
-*.log
-*.tmp
-*.swp
+# Fichiers de données et logs générés
+logs/
 *.csv
+*.bin
+*.log
+
+# Dossiers d'archives (optionnel)
+archive/
+
+# OS / IDE
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/

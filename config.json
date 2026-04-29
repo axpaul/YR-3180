@@ -1,0 +1,9 @@
+{
+  "port": "",
+  "baudrate": 9600,
+  "unit": "N",
+  "auto_trigger_threshold_n": 2.0,
+  "export_dir": "C:\\Users\\lou-l",
+  "plot_window_s": 10.0,
+  "propellant_mass_g": 0.0
+}

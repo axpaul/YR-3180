@@ -7,29 +7,47 @@
 
 import serial   # Pour communiquer en port série
 import struct   # Pour décoder les valeurs binaires (float notamment)
+import threading
+import time
+
+
+class CRCError(IOError):
+    """Réponse Modbus reçue avec un CRC invalide."""
+
+
+class ModbusTimeoutError(IOError):
+    """Réponse Modbus incomplète avant l'expiration du timeout."""
+
 
 class YR3180:
-    def __init__(self, port='COM7', baudrate=9600, slave_address=0x01):
+    def __init__(self, port='COM7', baudrate=9600, slave_address=0x01,
+                 timeout=0.2, retries=3):
         """
-        Initialise la connexion série avec les paramètres standard de la YR-3180
+        Initialise la connexion série avec les paramètres standard de la YR-3180.
+        - timeout : timeout série en secondes (0.2 s suffit largement à 9600+)
+        - retries : nombre d'essais en cas d'erreur CRC ou timeout
         """
         self.port = port
         self.baudrate = baudrate
         self.slave_address = slave_address
+        self.retries = retries
+        self._lock = threading.RLock()
         self.serial = serial.Serial(
             port=self.port,
             baudrate=self.baudrate,
             bytesize=8,
             parity='N',
             stopbits=1,
-            timeout=1
+            timeout=timeout,
         )
 
     def close(self):
         """
         Ferme proprement le port série
         """
-        self.serial.close()
+        with self._lock:
+            if self.serial.is_open:
+                self.serial.close()
 
 # ---------------------- Communication bas niveau ----------------------
 
@@ -73,12 +91,62 @@ class YR3180:
         request += self._calculate_crc(request)  # Ajout du CRC (2 octets LSB/MSB)
         return request
 
+    def _read_exact(self, n):
+        """
+        Lit exactement n octets sur le port série, en bouclant jusqu'à atteindre
+        n ou jusqu'au timeout effectif. Permet d'éviter qu'un read() unique
+        retourne une trame incomplète sans qu'on s'en rende compte.
+        """
+        deadline = time.monotonic() + max(self.serial.timeout or 0.2, 0.05)
+        buf = bytearray()
+        while len(buf) < n:
+            chunk = self.serial.read(n - len(buf))
+            if chunk:
+                buf.extend(chunk)
+            elif time.monotonic() >= deadline:
+                break
+        return bytes(buf)
+
+    def _validate_crc(self, frame):
+        """Vérifie que les 2 derniers octets de `frame` sont un CRC valide."""
+        if len(frame) < 4:
+            return False
+        expected = self._calculate_crc(frame[:-2])
+        return frame[-2:] == expected
+
     def _send_request(self, request, expected_response_length):
         """
-        Envoie la requête sur le port série et lit la réponse attendue
+        Envoie une requête Modbus RTU, lit la réponse attendue, valide son CRC
+        et réessaie jusqu'à `self.retries` fois en cas d'erreur transitoire.
+
+        Thread-safe : tout l'aller-retour est protégé par un RLock pour pouvoir
+        partager l'instance entre l'acquisition continue et la GUI.
         """
-        self.serial.write(request)
-        return self.serial.read(expected_response_length)
+        last_error = None
+        for attempt in range(self.retries):
+            with self._lock:
+                self.serial.reset_input_buffer()
+                self.serial.write(request)
+                response = self._read_exact(expected_response_length)
+
+            if len(response) != expected_response_length:
+                last_error = ModbusTimeoutError(
+                    f"Réponse incomplète ({len(response)}/{expected_response_length} octets) : {response.hex()}"
+                )
+            elif not self._validate_crc(response):
+                last_error = CRCError(f"CRC invalide sur réponse : {response.hex()}")
+            elif response[0] != self.slave_address:
+                last_error = IOError(f"Adresse esclave inattendue : {response.hex()}")
+            elif response[1] & 0x80:
+                # Bit 7 du code fonction = exception Modbus
+                exc_code = response[2] if len(response) > 2 else 0
+                last_error = IOError(f"Exception Modbus 0x{exc_code:02X}")
+            else:
+                return response
+
+            time.sleep(0.02 * (attempt + 1))  # léger backoff avant retry
+
+        raise last_error
 
     def _read_registers(self, register, count):
         """
@@ -87,19 +155,17 @@ class YR3180:
         """
         request = self._build_request(0x03, register, count=count)
         response = self._send_request(request, 5 + 2 * count)  # 5 = header + CRC
-        if len(response) >= 5 + 2 * count:
-            return response[3:3 + 2 * count]  # Extraction des octets de données
-        else:
-            raise ValueError(f"Réponse invalide : {response.hex()}")
+        return response[3:3 + 2 * count]
 
     def _write_register(self, register, value):
         """
-        Écriture d'un registre unique via la fonction 0x06
+        Écriture d'un registre unique via la fonction 0x06.
+        Le capteur doit renvoyer la trame à l'identique.
         """
         request = self._build_request(0x06, register, value=value)
-        response = self._send_request(request, 8)  # Réponse = écho exact
+        response = self._send_request(request, 8)
         if response != request:
-            raise ValueError(f"Écriture échouée. Réponse : {response.hex()}")
+            raise IOError(f"Écriture échouée (echo différent). Réponse : {response.hex()}")
 
     # ---------------------- Lecture des données ----------------------
 
@@ -123,7 +189,7 @@ class YR3180:
         data = self._read_registers(2, 2)
         return struct.unpack('>f', data)[0]  # '>f' = float big endian
 
- # ---------------------- Commandes directes (tare, calibration, etc.) ----------------------
+# ---------------------- Commandes directes (tare, calibration, etc.) ----------------------
 
     def tare(self):
         """Effectue une tare (mise à zéro du poids actuel)"""
@@ -277,9 +343,9 @@ class YR3180:
         """
         self._write_register(48, value)
 
-    
- # ---------------------- Calibration (scale factor, ADC min/max) ----------------------
-    
+
+# ---------------------- Calibration (scale factor, ADC min/max) ----------------------
+
     def set_full_scale_factor(self, value):
         """Écrit manuellement le facteur d’échelle dans les registres 13-14"""
         msb = (value >> 16) & 0xFFFF

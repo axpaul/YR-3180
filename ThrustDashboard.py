@@ -19,10 +19,11 @@ KG_TO_N = 9.80665
 
 class SensorReaderThread(QThread):
     new_data = Signal(float, float)  # timestamp, valeur_poids (en kg bruts)
+    hz_signal = Signal(float)
     log_signal = Signal(str)         # pour la console
     error_signal = Signal(str)
 
-    def __init__(self, port, baudrate, slave_address=1, target_hz=100, record_file=None):
+    def __init__(self, port, baudrate, slave_address=1, target_hz=100):
         super().__init__()
         self.port = port
         self.baudrate = baudrate
@@ -30,8 +31,25 @@ class SensorReaderThread(QThread):
         self.target_hz = target_hz
         self.interval = 1.0 / self.target_hz
         self._running = False
-        self.record_file = record_file
         self.sensor = None
+        self.is_recording = False
+        self.bin_file = None
+
+    def start_recording(self, filepath):
+        try:
+            self.bin_file = open(filepath, "wb")
+            self.is_recording = True
+        except Exception as e:
+            self.error_signal.emit(f"Erreur ouverture fichier: {e}")
+
+    def stop_recording(self):
+        self.is_recording = False
+        if self.bin_file:
+            try:
+                self.bin_file.close()
+            except:
+                pass
+            self.bin_file = None
 
     def run(self):
         self._running = True
@@ -64,26 +82,27 @@ class SensorReaderThread(QThread):
         start_time = time.perf_counter()
         next_call = start_time
         
-        bin_file = None
-        if self.record_file:
-            try:
-                bin_file = open(self.record_file, "wb")
-                self.log_signal.emit(f"Enregistrement binaire démarré: {self.record_file}")
-            except Exception as e:
-                self.error_signal.emit(f"Erreur d'ouverture du fichier d'enregistrement : {e}")
-                self._running = False
-        
         error_count = 0
+        frame_count = 0
+        last_hz_time = start_time
+        
         while self._running:
             try:
                 val_kg = self.sensor.read_weight_float()
                 t = time.perf_counter() - start_time
                 
-                if bin_file:
-                    bin_file.write(struct.pack('<dd', t, val_kg))
+                if self.is_recording and self.bin_file:
+                    self.bin_file.write(struct.pack('<dd', t, val_kg))
                 
                 self.new_data.emit(t, val_kg)
                 error_count = 0 # reset on success
+                
+                frame_count += 1
+                now = time.perf_counter()
+                if now - last_hz_time >= 1.0:
+                    self.hz_signal.emit(frame_count / (now - last_hz_time))
+                    frame_count = 0
+                    last_hz_time = now
                 
             except ValueError as ve:
                 error_count += 1
@@ -100,9 +119,7 @@ class SensorReaderThread(QThread):
             else:
                 next_call = time.perf_counter()
 
-        if bin_file:
-            bin_file.close()
-            self.log_signal.emit(f"Fichier d'enregistrement fermé.")
+        self.stop_recording()
             
         if self.sensor:
             try:
@@ -123,6 +140,50 @@ class SensorReaderThread(QThread):
                 self.log_signal.emit("✅ TARE effectuée avec succès.")
             except Exception as e:
                 self.log_signal.emit(f"❌ Erreur lors de la TARE: {e}")
+
+def generate_report(bin_path):
+    if not os.path.exists(bin_path):
+        return None
+        
+    times = []
+    thrusts_N = []
+    
+    try:
+        with open(bin_path, 'rb') as bf:
+            while True:
+                data = bf.read(16)
+                if len(data) < 16:
+                    break
+                t, val_kg = struct.unpack('<dd', data)
+                times.append(t)
+                thrusts_N.append(val_kg * KG_TO_N)
+    except Exception as e:
+        return f"Erreur lors de la lecture du fichier : {e}"
+        
+    if len(times) < 2:
+        return "Pas assez de données pour générer un rapport."
+        
+    times = np.array(times)
+    thrusts_N = np.array(thrusts_N)
+    
+    dt = np.diff(times)
+    avg_thrusts = (thrusts_N[:-1] + thrusts_N[1:]) / 2.0
+    impulse = np.sum(avg_thrusts * dt)
+    
+    max_thrust = np.max(thrusts_N)
+    total_time = times[-1] - times[0]
+    avg_thrust = impulse / total_time if total_time > 0 else 0
+    
+    report = (
+        f"📊 RAPPORT DE PERFORMANCES :\n"
+        f"-------------------------------\n"
+        f"⏱ Durée de combustion : {total_time:.3f} s\n"
+        f"🔥 Poussée Maximale : {max_thrust:.2f} N\n"
+        f"📈 Poussée Moyenne : {avg_thrust:.2f} N\n"
+        f"🚀 Impulsion Totale : {impulse:.2f} N.s\n"
+        f"-------------------------------"
+    )
+    return report
 
 def extract_bin_to_csv(bin_path):
     if not os.path.exists(bin_path):
@@ -195,6 +256,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.peak_label.setAlignment(QtCore.Qt.AlignCenter)
         self.peak_label.setStyleSheet("font-size: 28px; font-weight: bold; color: #FF5252; background-color: #111111; border: 2px solid #FF5252; border-radius: 8px; padding: 8px;") 
         
+        self.hz_label = QtWidgets.QLabel("Fréquence : 0.0 Hz")
+        self.hz_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.hz_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #BB86FC; background-color: #111111; border: 2px solid #BB86FC; border-radius: 8px; padding: 5px;")
+        
         self.unit_toggle_btn = QtWidgets.QPushButton("Unité Actuelle : NEWTONS")
         self.unit_toggle_btn.setStyleSheet("background-color: #0D47A1; color: white; font-size: 14px; border: none;")
         self.unit_toggle_btn.clicked.connect(self.toggle_unit)
@@ -208,6 +273,8 @@ class MainWindow(QtWidgets.QMainWindow):
         ind_layout.addSpacing(10)
         ind_layout.addWidget(QtWidgets.QLabel("Poussée Maximale :"))
         ind_layout.addWidget(self.peak_label)
+        ind_layout.addSpacing(10)
+        ind_layout.addWidget(self.hz_label)
         ind_layout.addSpacing(20)
         ind_layout.addWidget(self.unit_toggle_btn)
         ind_layout.addWidget(self.tare_btn)
@@ -234,13 +301,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.hz_input.setRange(1, 200)
         self.hz_input.setValue(100)
         
-        self.rec_checkbox = QtWidgets.QCheckBox("Enregistrer (.bin)")
-        self.rec_checkbox.setChecked(True)
-        
         acq_layout.addRow("Port:", port_layout)
         acq_layout.addRow("Baudrate:", self.baud_combo)
         acq_layout.addRow("Fréq (Hz):", self.hz_input)
-        acq_layout.addRow("", self.rec_checkbox)
         
         self.start_btn = QtWidgets.QPushButton("▶ DÉMARRER")
         self.start_btn.setStyleSheet("background-color: #1B5E20; color: white; font-size: 16px; border: none;")
@@ -251,11 +314,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stop_btn.setEnabled(False)
         self.stop_btn.clicked.connect(self.stop_acq)
         
+        self.rec_btn = QtWidgets.QPushButton("🔴 Lancer l'enregistrement")
+        self.rec_btn.setStyleSheet("background-color: #1B5E20; color: white; font-size: 16px; border: none; font-weight: bold; padding: 8px; border-radius: 5px;")
+        self.rec_btn.setEnabled(False)
+        self.rec_btn.clicked.connect(self.toggle_recording)
+        
+        self.is_recording = False
+        self.current_record_file = None
+        
         self.extract_btn = QtWidgets.QPushButton("Extraire CSV depuis .bin")
         self.extract_btn.clicked.connect(self.extract_csv)
         
         acq_layout.addRow(self.start_btn)
         acq_layout.addRow(self.stop_btn)
+        acq_layout.addRow(QtWidgets.QLabel(""))
+        acq_layout.addRow(self.rec_btn)
         acq_layout.addRow(QtWidgets.QLabel(""))
         acq_layout.addRow(self.extract_btn)
         acq_group.setLayout(acq_layout)
@@ -356,15 +429,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.peak_value = 0.0
         self.update_display_values()
         
-        record_file = None
-        if self.rec_checkbox.isChecked():
-            timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            record_file = f"test_motor_{timestamp_str}.bin"
-            
         self.log_message(f"--- Nouvelle session sur {port} ---")
             
-        self.reader_thread = SensorReaderThread(port, baudrate, target_hz=target_hz, record_file=record_file)
+        self.reader_thread = SensorReaderThread(port, baudrate, target_hz=target_hz)
         self.reader_thread.new_data.connect(self.on_new_data)
+        self.reader_thread.hz_signal.connect(self.on_hz_update)
         self.reader_thread.log_signal.connect(self.log_message)
         self.reader_thread.error_signal.connect(self.on_error)
         self.reader_thread.start()
@@ -373,20 +442,53 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.start_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
+        self.rec_btn.setEnabled(True)
         self.port_combo.setEnabled(False)
         self.refresh_port_btn.setEnabled(False)
         self.baud_combo.setEnabled(False)
 
+    def toggle_recording(self):
+        if not self.reader_thread or not self.reader_thread._running:
+            return
+            
+        if not self.is_recording:
+            timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.current_record_file = f"test_motor_{timestamp_str}.bin"
+            self.reader_thread.start_recording(self.current_record_file)
+            self.is_recording = True
+            self.rec_btn.setText("⬛ Arrêter l'enregistrement")
+            self.rec_btn.setStyleSheet("background-color: #B71C1C; color: white; font-size: 16px; border: none; font-weight: bold; padding: 8px; border-radius: 5px;")
+            self.log_message(f"▶️ Enregistrement démarré : {self.current_record_file}")
+        else:
+            self.reader_thread.stop_recording()
+            self.is_recording = False
+            self.rec_btn.setText("🔴 Lancer l'enregistrement")
+            self.rec_btn.setStyleSheet("background-color: #1B5E20; color: white; font-size: 16px; border: none; font-weight: bold; padding: 8px; border-radius: 5px;")
+            self.log_message(f"⏹️ Enregistrement arrêté : {self.current_record_file}")
+            
+            report = generate_report(self.current_record_file)
+            if report:
+                self.log_message("\n" + report)
+                QtWidgets.QMessageBox.information(self, "Rapport de Performances", report)
+
+    def on_hz_update(self, hz):
+        self.hz_label.setText(f"Fréquence : {hz:.1f} Hz")
+
     def stop_acq(self):
+        if self.is_recording:
+            self.toggle_recording()
+
         if self.reader_thread:
             self.log_message("🛑 Demande d'arrêt envoyée...")
             self.reader_thread.stop()
             self.reader_thread = None
             
         self.ui_timer.stop()
+        self.hz_label.setText("Fréquence : 0.0 Hz")
         
         self.start_btn.setEnabled(True)
         self.stop_btn.setEnabled(False)
+        self.rec_btn.setEnabled(False)
         self.port_combo.setEnabled(True)
         self.refresh_port_btn.setEnabled(True)
         self.baud_combo.setEnabled(True)

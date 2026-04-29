@@ -124,13 +124,13 @@ Python class to communicate with the **YR-3180** weighing module using the **Mod
 - **GND**: Negative power supply
 
 ### Sensor Interface
-- **E+**: Excitation positive (3.3V)  
-- **E-**: Excitation negative (GND)  
+- **E+**: Positive power intput  
+- **E-**: Negative power output (GND)
 - **S+**: Signal input positive  
 - **S-**: Signal input negative
 
 ### Communication (TTL / MODBUS RTU)
-- **5V**: Positive output of power  
+- **5V**: Positive power intput  
 - **RX**: Receive (other device’s TX)  
 - **TX**: Transmit (other device’s RX)  
 - **GND**: Negative power output

@@ -12,7 +12,7 @@ from datetime import datetime
 from yr3180 import YR3180
 
 class WeightLogger:
-    def __init__(self, port='COM7', filename='log.csv', flush_interval=1.0):
+    def __init__(self, port='COM13', filename='log.csv', flush_interval=1.0):
         self.balance = YR3180(port=port, baudrate=115200)
         self.interval = 0.01  
         self.flush_interval = flush_interval
@@ -67,7 +67,7 @@ class WeightLogger:
         print("🛑 Logger arrêté.")
 
 if __name__ == '__main__':
-    logger = WeightLogger(port='COM7', filename='log.csv')
+    logger = WeightLogger(port='COM13', filename='log.csv')
     try:
         logger.start()
         while True:

@@ -29,7 +29,7 @@ request = bytearray([0x01, 0x03, 0x00, 0x00, 0x00, 0x02])
 request += calculate_crc(request)  # Ajout du CRC calculé à la fin de la trame
 
 # Ouverture de la communication série avec les bons paramètres
-with serial.Serial('COM7', baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1) as ser:
+with serial.Serial('COM13', baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1) as ser:
     ser.write(request)  # Envoi de la trame Modbus sur le port série
 
     # Lecture de la réponse :

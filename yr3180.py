@@ -9,7 +9,7 @@ import serial   # Pour communiquer en port série
 import struct   # Pour décoder les valeurs binaires (float notamment)
 
 class YR3180:
-    def __init__(self, port='COM7', baudrate=9600, slave_address=0x01):
+    def __init__(self, port='COM5', baudrate=9600, slave_address=0x01):
         """
         Initialise la connexion série avec les paramètres standard de la YR-3180
         """
@@ -77,6 +77,7 @@ class YR3180:
         """
         Envoie la requête sur le port série et lit la réponse attendue
         """
+        self.serial.reset_input_buffer()
         self.serial.write(request)
         return self.serial.read(expected_response_length)
 
@@ -86,11 +87,16 @@ class YR3180:
         - Retourne les octets de données (sans en-tête ni CRC)
         """
         request = self._build_request(0x03, register, count=count)
-        response = self._send_request(request, 5 + 2 * count)  # 5 = header + CRC
-        if len(response) >= 5 + 2 * count:
-            return response[3:3 + 2 * count]  # Extraction des octets de données
-        else:
-            raise ValueError(f"Réponse invalide : {response.hex()}")
+        expected_len = 5 + 2 * count
+        response = self._send_request(request, expected_len)  # 5 = header + CRC
+        if len(response) < expected_len:
+            raise ValueError(f"Réponse trop courte. Envoyé: {request.hex()} | Reçu: {response.hex()} (attendu {expected_len} octets)")
+            
+        # Vérification du CRC
+        if response[-2:] != self._calculate_crc(response[:-2]):
+            raise ValueError(f"Erreur CRC. Envoyé: {request.hex()} | Reçu: {response.hex()}")
+            
+        return response[3:3 + 2 * count]  # Extraction des octets de données
 
     def _write_register(self, register, value):
         """
@@ -98,8 +104,15 @@ class YR3180:
         """
         request = self._build_request(0x06, register, value=value)
         response = self._send_request(request, 8)  # Réponse = écho exact
+        if len(response) < 8:
+            raise ValueError(f"Réponse trop courte. Envoyé: {request.hex()} | Reçu: {response.hex()}")
+            
+        # Vérification du CRC
+        if response[-2:] != self._calculate_crc(response[:-2]):
+            raise ValueError(f"Erreur CRC en écriture. Envoyé: {request.hex()} | Reçu: {response.hex()}")
+            
         if response != request:
-            raise ValueError(f"Écriture échouée. Réponse : {response.hex()}")
+            raise ValueError(f"Écriture échouée. Envoyé: {request.hex()} | Reçu: {response.hex()}")
 
     # ---------------------- Lecture des données ----------------------
 
